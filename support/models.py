@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from authentification.models import User
 
@@ -26,7 +27,6 @@ class Contributor(models.Model):
 
 class Issue(models.Model):
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='issue_author')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=False)
     priority = models.CharField(max_length=50,
@@ -42,4 +42,13 @@ class Issue(models.Model):
                                          ('In Progress', 'In Progress'),
                                          ('Finished', 'Finished')],
                                 default="To Do")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='issue_author')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='issues')
+
+
+class Comment(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    description = models.TextField(blank=False)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_author')
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='comments')
