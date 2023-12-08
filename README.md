@@ -12,7 +12,7 @@
 
 
 
-## Context - Use Python fundamentals for market analysis
+## Context - 
 
 
 ## Skills
