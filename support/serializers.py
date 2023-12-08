@@ -60,7 +60,7 @@ class CommentSerializer(ModelSerializer):
 
     author = UserSerializer(read_only=True)
     project = ProjectSerializer(read_only=True)
-    issue = IssueSerializer(read_only=True)    
+    issue = IssueSerializer(read_only=True)
 
     class Meta:
         model = Comment
@@ -70,7 +70,6 @@ class CommentSerializer(ModelSerializer):
     def create(self, validated_data):
         project_id = self.context['request'].resolver_match.kwargs.get('project_id')
         issue_id = self.context['request'].resolver_match.kwargs.get('issue_id')
-        print('_________________', issue_id)
         user = self.context['request'].user
         validated_data['author'] = user
         validated_data['issue'] = Issue.objects.get(id=issue_id)

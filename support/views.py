@@ -1,5 +1,5 @@
-from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
+from support.permissions import IsAuthorOrContributor
 
 from support.serializers import ProjectSerializer
 from support.serializers import ContributorSerializer
@@ -17,6 +17,7 @@ from support.models import Comment
 class ProjectViewSet(ModelViewSet):
 
     serializer_class = ProjectSerializer
+    permission_classes = [IsAuthorOrContributor]
 
     def get_queryset(self):
         return Project.objects.all()
@@ -25,6 +26,7 @@ class ProjectViewSet(ModelViewSet):
 class ContributorViewSet(ModelViewSet):
 
     serializer_class = ContributorSerializer
+    permission_classes = [IsAuthorOrContributor]
 
     def get_queryset(self):
         return Contributor.objects.all()
@@ -33,6 +35,7 @@ class ContributorViewSet(ModelViewSet):
 class IssueViewSet(ModelViewSet):
 
     serializer_class = IssueSerializer
+    permission_classes = [IsAuthorOrContributor]
 
     def get_queryset(self):
         return Issue.objects.all()
@@ -41,6 +44,7 @@ class IssueViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
 
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthorOrContributor]
 
     def get_queryset(self):
         return Comment.objects.all()

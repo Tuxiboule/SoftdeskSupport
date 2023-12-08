@@ -15,7 +15,7 @@ class Project(models.Model):
                                      ('front-end', 'Frond-End'),
                                      ('iOS', 'iOS'),
                                      ('android', 'Android')])
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='project_author')
+    author = models.ForeignKey(User, on_delete=models.SET(">Deleted<"), related_name='project_author')
     contributors = models.ManyToManyField(User, through='Contributor', related_name='contributed_projects')
 
 
