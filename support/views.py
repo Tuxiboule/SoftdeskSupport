@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from support.permissions import IsAuthorOrContributor
+from django.shortcuts import get_object_or_404
 
 from support.serializers import ProjectSerializer
 from support.serializers import ContributorSerializer
@@ -16,17 +17,19 @@ from support.models import Comment
 
 class ProjectViewSet(ModelViewSet):
 
-    serializer_class = ProjectSerializer
     permission_classes = [IsAuthorOrContributor]
+    serializer_class = ProjectSerializer
 
     def get_queryset(self):
-        return Project.objects.all()
+        user = self.request.user
+        contributor_projects = Contributor.objects.filter(user=user).values_list('project', flat=True)
+        return Project.objects.filter(id__in=contributor_projects)
 
 
 class ContributorViewSet(ModelViewSet):
 
+    #permission_classes = [IsAuthorOrContributor]
     serializer_class = ContributorSerializer
-    permission_classes = [IsAuthorOrContributor]
 
     def get_queryset(self):
         return Contributor.objects.all()
@@ -34,17 +37,27 @@ class ContributorViewSet(ModelViewSet):
 
 class IssueViewSet(ModelViewSet):
 
-    serializer_class = IssueSerializer
     permission_classes = [IsAuthorOrContributor]
+    serializer_class = IssueSerializer
 
     def get_queryset(self):
-        return Issue.objects.all()
+        project_id = self.kwargs.get('project_id')
+        project = Project.objects.get(id=project_id)
+        user = self.request.user
+        if user in project.contributors.all():
+            issues = project.issues.all()
+            return issues
+        else:
+            return Issue.objects.none()
 
 
 class CommentViewSet(ModelViewSet):
 
-    serializer_class = CommentSerializer
     permission_classes = [IsAuthorOrContributor]
+    serializer_class = CommentSerializer
 
     def get_queryset(self):
-        return Comment.objects.all()
+        issue_id = self.kwargs.get('issue_id')
+        issue = Issue.objects.get(id=issue_id)
+
+        return issue.comments.all()

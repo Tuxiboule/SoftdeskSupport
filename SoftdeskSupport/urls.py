@@ -26,14 +26,16 @@ from support.views import CommentViewSet
 
 router = routers.SimpleRouter()
 router.register('user', UserViewSet, basename='user')
+
 router.register('project', ProjectViewSet, basename='project')
+
 router.register('contributor', ContributorViewSet, basename="contributor")
+
 router.register(r'project/(?P<project_id>\d+)/issue',
                 IssueViewSet, basename='project-issue')
-router.register('issue', IssueViewSet, basename='issue')
-router.register(r'project/(?P<project_id>\d+)/issue/(?P<issue_id>\d+).comment',
+
+router.register(r'issue/(?P<issue_id>\d+)/comment',
                 CommentViewSet, basename='issue-comment')
-router.register('comment', CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

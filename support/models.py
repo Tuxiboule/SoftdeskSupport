@@ -3,26 +3,11 @@ from django.db import models
 from authentification.models import User
 
 
-class Project(models.Model):
+class Comment(models.Model):
 
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=255)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(blank=False)
-    active = models.BooleanField(default=False)
-    type = models.CharField(max_length=50,
-                            choices=[('back-end', 'Back-End'),
-                                     ('front-end', 'Frond-End'),
-                                     ('iOS', 'iOS'),
-                                     ('android', 'Android')])
-    author = models.ForeignKey(User, on_delete=models.SET(">Deleted<"), related_name='project_author')
-    contributors = models.ManyToManyField(User, through='Contributor', related_name='contributed_projects')
-
-
-class Contributor(models.Model):
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contributions')
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='contributor_project')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_author')
 
 
 class Issue(models.Model):
@@ -43,12 +28,26 @@ class Issue(models.Model):
                                          ('Finished', 'Finished')],
                                 default="To Do")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='issue_author')
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='issues')
+    comments = models.ManyToManyField(Comment, related_name='issue_comments', blank=True)
 
 
-class Comment(models.Model):
+class Project(models.Model):
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=255)
     description = models.TextField(blank=False)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_author')
-    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='comments')
+    active = models.BooleanField(default=False)
+    type = models.CharField(max_length=50,
+                            choices=[('back-end', 'Back-End'),
+                                     ('front-end', 'Frond-End'),
+                                     ('iOS', 'iOS'),
+                                     ('android', 'Android')])
+    author = models.ForeignKey(User, on_delete=models.SET(">Deleted<"), related_name='project_author')
+    contributors = models.ManyToManyField(User, through='Contributor', related_name='contributed_projects')
+    issues = models.ManyToManyField(Issue, related_name='project_issues', blank=True)
+
+
+class Contributor(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contributions')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='contributor_project')
