@@ -37,7 +37,6 @@ class ProjectViewSet(ModelViewSet):
             match = re.match(r'^/api/project/(?P<project_id>\d+)/$', self.request.path)
             project_id = match.group('project_id')
             project = Project.objects.filter(id=project_id)
-            # If contributor
             if project[0] in projects:
                 return project
             else:
@@ -57,6 +56,7 @@ class ContributorViewSet(ModelViewSet):
 class IssueViewSet(ModelViewSet):
 
     serializer_class = IssueSerializer
+    permission_classes = [IsAuthorOrContributor]
 
     def get_queryset(self):
         user = self.request.user

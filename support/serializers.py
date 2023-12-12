@@ -39,20 +39,15 @@ class IssueSerializer(ModelSerializer):
 
     class Meta:
         model = Issue
-        fields = ['id', 'name']
-        'id', 'name', 'description', 'type', 'issues', 'author', 'contributors', 'active'
+        fields = '__all__'
         read_only_fields = ['author', 'project']
 
     def create(self, validated_data):
         user = self.context['request'].user
         project_id = self.context['request'].resolver_match.kwargs.get('project_id')
         project = Project.objects.get(id=project_id)
-        if user not in project.contributors.all():
-            Contributor.objects.create(user=user, project=project)
-
         validated_data['author'] = user
         issue = Issue.objects.create(**validated_data)
-        print(project.name)
         project.issues.add(issue)
         return issue
 
