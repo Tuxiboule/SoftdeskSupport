@@ -47,7 +47,7 @@ class ContributorViewSet(ModelViewSet):
 
     # permission_classes = ISSUPERVISOR
     serializer_class = ContributorSerializer
-    permission_classes = [IsAuthorOrContributor]
+    #permission_classes = [IsAuthorOrContributor]
 
     def get_queryset(self):
         return Contributor.objects.all()
@@ -62,9 +62,8 @@ class IssueViewSet(ModelViewSet):
         user = self.request.user
         contributions = user.contributions.all()
         contributed_projects_id = [contribution.project.id for contribution in contributions]
-        
-        match = re.match(r'^/api/project/(?P<project_id>\d+)/', self.request.path)
-        project_id = match.group('project_id')
+        project_id = self.kwargs.get('project_id')
+
         if str(project_id) in map(str, contributed_projects_id):
             return Issue.objects.filter(project=project_id)
         else:
@@ -77,7 +76,14 @@ class CommentViewSet(ModelViewSet):
     permission_classes = [IsAuthorOrContributor]
 
     def get_queryset(self):
+        user = self.request.user
+        contributions = user.contributions.all()
+        contributed_projects_id = [contribution.project.id for contribution in contributions]
         issue_id = self.kwargs.get('issue_id')
         issue = Issue.objects.get(id=issue_id)
+        project_id = issue.project.id
 
-        return issue.comments.all()
+        if str(project_id) in map(str, contributed_projects_id):
+            return Comment.objects.filter(issue=issue_id)
+        else:
+            return Comment.objects.none()

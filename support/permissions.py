@@ -11,7 +11,6 @@ class IsAuthorOrContributor(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         user = request.user
-        print(obj)
 
         # Si l'utilisateur est l'auteur, autoriser l'accès complet
         if obj.author == user:
@@ -38,7 +37,6 @@ class IsAuthorOrContributor(permissions.BasePermission):
             project_id = match.group('project_id')
             project = Project.objects.get(id=project_id)
             user = request.user
-            print(project, user)
             if project.contributors.filter(username=user.username).exists():
                 return True
             else:
