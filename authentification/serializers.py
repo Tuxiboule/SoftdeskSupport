@@ -20,8 +20,7 @@ class UserSerializer(ModelSerializer):
                   'password',
                   'birthdate',
                   'can_be_contacted',
-                  'can_be_shared',
-                  'is_active']
+                  'can_be_shared']
 
     def validate_birthdate(self, value):
         today = date.today()

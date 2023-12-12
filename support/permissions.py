@@ -6,9 +6,6 @@ from support.models import Issue
 
 
 class IsAuthorOrContributor(permissions.BasePermission):
-    """
-    Permission to allow read-only access to contributors and full access to the author.
-    """
 
     def has_object_permission(self, request, view, obj):
         user = request.user
@@ -24,9 +21,6 @@ class IsAuthorOrContributor(permissions.BasePermission):
         return False
 
     def is_contributor(self, user, obj):
-        """
-        Vérifie si l'utilisateur est un contributeur du projet associé à l'objet.
-        """
         if isinstance(obj, Project):
             return obj.contributors.filter(user=user).exists()
         elif isinstance(obj, (Issue, Comment)) and hasattr(obj, 'project'):
