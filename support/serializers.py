@@ -1,10 +1,10 @@
 from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
+
 from support.models import Project
 from support.models import Contributor
 from support.models import Issue
 from support.models import Comment
-from authentification.serializers import UserSerializer
-from rest_framework import serializers
 
 
 class CommentSerializer(ModelSerializer):
@@ -14,13 +14,10 @@ class CommentSerializer(ModelSerializer):
     Attributes:
         author (UserSerializer): Serializer for the author of the comment.
     """
-
-    author = UserSerializer(read_only=True)
-
     class Meta:
         model = Comment
         fields = '__all__'
-        read_only_fields = ['author', 'project']
+        read_only_fields = ['author', 'issue']
 
     def create(self, validated_data):
         """
@@ -41,8 +38,8 @@ class CommentSerializer(ModelSerializer):
             return "user not in contributors please sub to project"
 
         validated_data['author'] = user
+        validated_data['issue'] = issue
         comment = Comment.objects.create(**validated_data)
-        issue.comments.add(comment)
         return comment
 
 
@@ -55,7 +52,6 @@ class IssueSerializer(ModelSerializer):
         comments (CommentSerializer): Serializer for the comments associated with the issue.
     """
 
-    author = UserSerializer(read_only=True)
     comments = CommentSerializer(many=True, required=False)
 
     class Meta:
@@ -77,8 +73,8 @@ class IssueSerializer(ModelSerializer):
         project_id = self.context['request'].resolver_match.kwargs.get('project_id')
         project = Project.objects.get(id=project_id)
         validated_data['author'] = user
+        validated_data['project'] = project
         issue = Issue.objects.create(**validated_data)
-        project.issues.add(issue)
         return issue
 
 
@@ -92,8 +88,6 @@ class ProjectSerializer(ModelSerializer):
         issues (IssueSerializer): Serializer for the issues associated with the project.
     """
 
-    author = UserSerializer(read_only=True)
-    contributors = serializers.StringRelatedField(many=True, read_only=True)
     issues = IssueSerializer(many=True, required=False)
 
     class Meta:

@@ -15,7 +15,7 @@ class IsSupervisor(permissions.BasePermission):
         has_permission: Check if the user is a supervisor.
     """
 
-    def has_object_permission(self, request, obj):
+    def has_object_permission(self, request, obj, view):
         """
         Check if the user is a supervisor or the owner of the object.
 
@@ -27,9 +27,8 @@ class IsSupervisor(permissions.BasePermission):
         Returns:
             bool: True if the user is a supervisor or the owner, False otherwise.
         """
-        print("######ojbect")
         user = request.user
-        if user.is_supervisor or user == obj:
+        if user.is_supervisor or user == obj or user == view:
             return True
         else:
             return False
@@ -45,10 +44,12 @@ class IsSupervisor(permissions.BasePermission):
         Returns:
             bool: True if the user is a supervisor, False otherwise.
         """
+        # Non-loged user creation
+        if request.method == "POST" and request.path != "/api/contributor/":
+            return True
         user = request.user
-        request_path = request.path
         pattern = re.compile(r"user/\d+/$")
-        if pattern.search(request_path):
+        if pattern.search(request.path):
             return True
         return user.is_supervisor
 

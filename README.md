@@ -51,6 +51,7 @@ http://127.0.0.1:8000/api/user/{user_id}/
 - Features
   - User can not be under 15 years (RGPD restriction)
   - Password is hashed
+  - User can modify or delete ourselves
 
 - Rights
   - Supervisor : POST, GET, PATCH, DELETE
@@ -175,6 +176,7 @@ http://127.0.0.1:8000/api/project/{project_id}/issue/{issue_id}/comment/{comment
 - SQLite Database
 - Endpoint testing with Postman
 - Greencode
+- Response time optimisation (under 200ms)
 
 ## Credits
 [Tuxiboule](https://github.com/Tuxiboule)
