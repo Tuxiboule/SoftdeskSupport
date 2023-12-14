@@ -8,6 +8,12 @@ from rest_framework import serializers
 
 
 class CommentSerializer(ModelSerializer):
+    """
+    Serializer for Comment model.
+
+    Attributes:
+        author (UserSerializer): Serializer for the author of the comment.
+    """
 
     author = UserSerializer(read_only=True)
 
@@ -17,7 +23,15 @@ class CommentSerializer(ModelSerializer):
         read_only_fields = ['author', 'project']
 
     def create(self, validated_data):
+        """
+        Create a new comment instance with validated data.
 
+        Args:
+            validated_data (dict): Validated data for creating the comment.
+
+        Returns:
+            Comment: Newly created Comment instance.
+        """
         user = self.context['request'].user
         issue_id = self.context['request'].resolver_match.kwargs.get('issue_id')
         issue = Issue.objects.get(id=issue_id)
@@ -33,6 +47,13 @@ class CommentSerializer(ModelSerializer):
 
 
 class IssueSerializer(ModelSerializer):
+    """
+    Serializer for Issue model.
+
+    Attributes:
+        author (UserSerializer): Serializer for the author of the issue.
+        comments (CommentSerializer): Serializer for the comments associated with the issue.
+    """
 
     author = UserSerializer(read_only=True)
     comments = CommentSerializer(many=True, required=False)
@@ -43,6 +64,15 @@ class IssueSerializer(ModelSerializer):
         read_only_fields = ['author', 'project']
 
     def create(self, validated_data):
+        """
+        Create a new issue instance with validated data.
+
+        Args:
+            validated_data (dict): Validated data for creating the issue.
+
+        Returns:
+            Issue: Newly created Issue instance.
+        """
         user = self.context['request'].user
         project_id = self.context['request'].resolver_match.kwargs.get('project_id')
         project = Project.objects.get(id=project_id)
@@ -53,6 +83,14 @@ class IssueSerializer(ModelSerializer):
 
 
 class ProjectSerializer(ModelSerializer):
+    """
+    Serializer for Project model.
+
+    Attributes:
+        author (UserSerializer): Serializer for the author of the project.
+        contributors (StringRelatedField): Serializer for contributors to the project.
+        issues (IssueSerializer): Serializer for the issues associated with the project.
+    """
 
     author = UserSerializer(read_only=True)
     contributors = serializers.StringRelatedField(many=True, read_only=True)
@@ -64,6 +102,15 @@ class ProjectSerializer(ModelSerializer):
         read_only_fields = ['author']
 
     def create(self, validated_data):
+        """
+        Create a new project instance with validated data.
+
+        Args:
+            validated_data (dict): Validated data for creating the project.
+
+        Returns:
+            Project: Newly created Project instance.
+        """
         user = self.context['request'].user
         validated_data['author'] = user
         project = Project.objects.create(**validated_data)
@@ -72,24 +119,31 @@ class ProjectSerializer(ModelSerializer):
 
 
 class ContributorSerializer(ModelSerializer):
+    """
+    Serializer for Contributor model.
+    """
 
     class Meta:
         model = Contributor
         fields = ['id', 'user', 'project']
 
     def create(self, validated_data):
-        # Récupérer les données du validateur
+        """
+        Create a new contributor instance with validated data.
+
+        Args:
+            validated_data (dict): Validated data for creating the contributor.
+
+        Returns:
+            Contributor: Newly created Contributor instance.
+        """
         user = validated_data.get('user')
         project = validated_data.get('project')
 
-        # Vérifier s'il existe déjà un objet Contributor avec le même utilisateur et projet
         existing_contributor = Contributor.objects.filter(user=user, project=project).first()
 
         if existing_contributor:
-            # Gérer le cas où un objet Contributor avec le même utilisateur et projet existe déjà
-            # Vous pouvez lever une exception, renvoyer un message d'erreur, etc.
             raise serializers.ValidationError("L'utilisateur est déjà contributeur sur ce projet")
 
-        # Si aucun objet Contributor avec le même utilisateur et projet n'existe, créer l'objet Contributor
         contributor = Contributor.objects.create(**validated_data)
         return contributor

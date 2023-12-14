@@ -1,10 +1,10 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 import re
 
 from support.permissions import IsAuthorOrContributor
+from support.permissions import IsSupervisor
 
 from support.serializers import ProjectSerializer
 from support.serializers import ContributorSerializer
@@ -22,7 +22,7 @@ from support.models import Comment
 class ProjectViewSet(ModelViewSet):
 
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthorOrContributor]
+    permission_classes = [IsAuthorOrContributor, IsAuthenticated]
 
     def get_queryset(self):
 
@@ -45,9 +45,8 @@ class ProjectViewSet(ModelViewSet):
 
 class ContributorViewSet(ModelViewSet):
 
-    # permission_classes = ISSUPERVISOR
     serializer_class = ContributorSerializer
-    #permission_classes = [IsAuthorOrContributor]
+    permission_classes = [IsSupervisor, IsAuthenticated]
 
     def get_queryset(self):
         return Contributor.objects.all()
@@ -56,7 +55,7 @@ class ContributorViewSet(ModelViewSet):
 class IssueViewSet(ModelViewSet):
 
     serializer_class = IssueSerializer
-    permission_classes = [IsAuthorOrContributor]
+    permission_classes = [IsAuthorOrContributor, IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -73,7 +72,7 @@ class IssueViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
 
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthorOrContributor]
+    permission_classes = [IsAuthorOrContributor, IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
