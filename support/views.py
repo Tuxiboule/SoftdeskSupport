@@ -78,6 +78,7 @@ class CommentViewSet(ModelViewSet):
         user = self.request.user
         contributions = user.contributions.all()
         contributed_projects_id = [contribution.project.id for contribution in contributions]
+
         issue_id = self.kwargs.get('issue_id')
         issue = Issue.objects.get(id=issue_id)
         project_id = issue.project.id
