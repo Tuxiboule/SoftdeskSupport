@@ -176,7 +176,7 @@ http://127.0.0.1:8000/api/project/{project_id}/issue/{issue_id}/comment/{comment
 - SQLite Database
 - Endpoint testing with Postman
 - Greencode
-- Response time optimisation (under 200ms)
+- Response time optimisation
 
 ## Credits
 [Tuxiboule](https://github.com/Tuxiboule)
